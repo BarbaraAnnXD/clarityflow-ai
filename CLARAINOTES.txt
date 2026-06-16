@@ -1,0 +1,111 @@
+clarityflow-ai/
+  app.py                 ← main Streamlit app
+  econ_mode.py           ← scoring/math logic
+  decision_engine.py     ← ranking and recommendations
+  data/
+    career_paths.csv     ← career path data
+  requirements.txt       ← packages needed
+  README.md              ← project explanation
+
+#career_paths.csv is a simple data table the app will read. Think of it as the first app "knowledge base" It tells ClarityFlow what career paths exist and what basic traits each path has.
+#path - The career option being compared
+#cost_level - How expensive it usually is
+#time_to-result - How long it usually takes to see career progress
+#risk_level - How uncertain or risky it is
+#flexability - How well it fits around work/family/life
+#credential_strength - How strong the formal proof/credential is
+#income_speed - How quickly it can lead to income_speed
+#notes - Plain-English explanation
+#The score is 1 to 5, 1 low to 5 high. Example row: Degree, 4,4,2,2,5,2Strong credential but higher cost and longer 
+#Field              Value        Meaning 
+#path           Degree           Usually expensive
+#cost            4               Takes Longer
+#time            4               Takes Longer
+#risk            2               Lower risk compared to startup/self-taught
+#flexability     2               Less flexible
+#credential      5               Strong formal proof
+#incomespeed     2               Usually slower to income
+#Notes           text            Explains the tradeoff
+_______________________________________________________________________________________________________________________________________________
+Responsible AI Questions:
+Who could be hurt and how?
+Who is missing from my training data?
+Do I need this data at all?
+When should a human decide instead?
+Can I explain why the mode decides this?
+What can go wrong?
+Who could be harmed?
+Is the output reliable?
+Can the user verify the answer?
+Should the human review the results?
+Are limitations clearly stated?
+Be honest, what can it do and not do?
+Do we really need this data?
+
+Harm identification:
+Map Stakeholders: Direct user? indirect affected parties? Society?
+What is the worst realistic outcome is this system is wrong.
+Write one sentence about the potential harm before writing any code.
+Example: Mental Health app: a false "all clear" could delay someone seeking help
+Example:
+-->students (directuser)
+-->counselor (act on output)
+-->institution (policy to data)
+worst outcome false "all clear" for student in crisis
+_____________________________________________________________________________________________________________________________________________________
+Direct user - Student, young professional, or career changer may trust the output too much
+Family/dependence - A bad path could affect household money, time, childcare, or stability
+Career counselors/mentors - They may review or challenge the AI output
+Schools/bootcamps - The app could unfairly favor or discourage certain education paths
+Employers/jobs market - Recommendation could push users toward unrealistic or overcrowded paths
+Society - Bad advice at scale could worsen inequality if bias toward people with money/time/support
+
+Worst realistic outcome: The user treats the AI recommendation as final life advice, takes on dept or quits a job to quickly, then end up with financial stress, delayed career progress, or lost confidence. 
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Responsible AI answers for our app
+Who could be hurt and how?
+
+Users could be hurt if the system recommends an unrealistic path based on incomplete information. A person with limited money, caregiving responsibilities, or urgent income needs could be pushed toward a path that increases stress or debt.
+
+Who is missing from the data?
+
+Our starting data may miss rural users, low-income users, parents/caregivers, disabled users, people without transportation, people without strong internet access, older career changers, undocumented students, veterans, and people without family support.
+
+Do we need this data at all?
+
+We do not need exact income, exact address, full name, number of children, employer name, documents, or private records. We only need safe ranges like budget pressure, time availability, flexibility needs, risk tolerance, and general location type.
+
+When should a human decide instead?
+
+A human should review before major life decisions like quitting a job, taking on debt, moving cities, enrolling in a costly program, or choosing a path that affects family stability.
+
+Can we explain why the model decides this?
+
+Yes. The app should show the score factors: cost, time, risk, flexibility, credential strength, income speed, and user priorities. The user should see why a path ranked higher.
+
+What can go wrong?
+
+The app could use biased assumptions, outdated pathway data, incomplete user input, overconfident AI wording, or generic career advice that ignores real-life constraints.
+
+Is the output reliable?
+
+It is reliable as a decision-support tool, not as a final answer. It can organize tradeoffs, but it cannot guarantee income, job placement, program quality, or future success.
+
+Can the user verify the answer?
+
+Yes. The app should encourage users to verify costs, job outcomes, program reviews, financial aid, local job demand, and mentor/counselor feedback before acting.
+
+Are limitations clearly stated?
+
+They need to be. The app should say:
+
+“ClarityFlow AI helps compare options and surface tradeoffs. It does not guarantee career outcomes or replace advice from a counselor, mentor, financial advisor, or trusted human.”
+
+Add this to our project notes
+
+Not in career_paths.csv. Put this later in README.md or a responsible_ai.md file.
+
+For now, the coding rule is:
+
+Every recommendation must show why it ranked that path and remind the user that the final decision belongs to them.
+

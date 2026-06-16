@@ -1,0 +1,7 @@
+path,cost_level,time_to_result,risk_level,flexibility,credential_strength,income_speed,notes
+Degree,4,4,2,2,5,2,Strong credential but higher cost and longer timeline
+Bootcamp,3,2,4,3,3,4,Faster skill path but quality and job outcomes vary
+Self-Taught,1,3,4,5,2,3,Low cost and flexible but harder to prove skills
+Job Now,1,1,3,3,2,5,Immediate income but may slow long-term growth
+Graduate School,5,4,3,2,5,2,Advanced credential but high cost and delayed income
+Startup,4,3,5,4,1,1,High freedom and upside but unstable income
