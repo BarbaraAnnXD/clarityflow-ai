@@ -7,6 +7,7 @@ from decision_engine import (
     get_reality_check,
     get_confidence_boost,
     get_main_warning,
+    get_path_strategy_profile,
 )
 from ai_brain import generate_ai_summary
 
@@ -201,14 +202,18 @@ if st.button("Build My Plan", type="primary"):
 
     st.write("### Main Warning")
     st.warning(get_main_warning(top_path))
-
+    
     st.write("### AI Strategy Plan")
+
+    path_strategy_profile = get_path_strategy_profile(top_path["path"])
+
     ai_summary = generate_ai_summary(
         career_goal,
         decision_question,
         top_path,
         backup_path,
         results,
+        path_strategy_profile,
     )
     st.markdown(ai_summary)
 
@@ -219,10 +224,7 @@ if st.button("Build My Plan", type="primary"):
         "This ranking is based on general pathway assumptions and your current priority sliders. "
         "It does not guarantee income, job placement, program quality, or future success."
     )
-
-    st.write("### Confidence Boost")
-    st.info(get_confidence_boost(top_path["path"]))
-
+    
     with st.expander("Optional: View Decision Map + scoring details"):
         st.write("### Why this path surfaced")
         st.write(top_path["notes"])
@@ -256,4 +258,4 @@ if st.button("Build My Plan", type="primary"):
             ]
         ].reset_index(drop=True)
 
-        st.dataframe(display_results, use_container_width=True, hide_index=True)
+        st.dataframe(display_results, width="stretch", hide_index=True)

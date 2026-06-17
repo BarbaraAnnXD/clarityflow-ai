@@ -113,3 +113,121 @@ def get_main_warning(top_path):
         "No major danger signal is standing out, but this should still be treated as "
         "decision support, not a guaranteed outcome."
     )
+
+def get_path_strategy_profile(path_name):
+    """
+    Gives the AI more path-specific context so the 7-day checklist
+    is less generic and more useful.
+    """
+
+    profiles = {
+        "Degree": {
+            "strategy_focus": "Verify whether a degree is truly needed for the target role and reduce cost/time risk.",
+            "best_actions": [
+                "check degree requirements for the target career",
+                "review financial aid or transfer credits",
+                "compare graduation timeline against income needs",
+                "talk to an academic advisor",
+                "identify one course or requirement that moves the user forward"
+            ],
+            "avoid": [
+                "enrolling without checking total cost",
+                "assuming every career requires a degree",
+                "ignoring income needs while studying"
+            ],
+        },
+        "Bootcamp": {
+            "strategy_focus": "Validate program quality before paying and make sure the schedule fits real life.",
+            "best_actions": [
+                "compare bootcamp cost and payment terms",
+                "check job placement claims carefully",
+                "read independent reviews",
+                "ask graduates about outcomes",
+                "confirm whether the schedule fits work/family responsibilities"
+            ],
+            "avoid": [
+                "trusting marketing claims without evidence",
+                "taking on debt without reviewing refund policies",
+                "choosing speed over quality"
+            ],
+        },
+        "Self-Taught": {
+            "strategy_focus": "Create proof of skills through a small project and a consistent learning routine.",
+            "best_actions": [
+                "choose one skill to test this week",
+                "build one tiny project",
+                "upload proof of work to GitHub or a portfolio",
+                "follow a simple learning schedule",
+                "compare skills against real job postings"
+            ],
+            "avoid": [
+                "learning randomly with no project",
+                "watching tutorials without building",
+                "waiting until everything feels perfect"
+            ],
+        },
+        "Job Now": {
+            "strategy_focus": "Stabilize income while protecting time for the longer-term career path.",
+            "best_actions": [
+                "choose realistic jobs to apply for this week",
+                "update one resume section",
+                "apply to a small number of jobs",
+                "identify one skill to build outside work",
+                "protect a weekly learning block"
+            ],
+            "avoid": [
+                "getting stuck in survival mode",
+                "taking any job without considering schedule impact",
+                "abandoning the long-term career goal"
+            ],
+        },
+        "Graduate School": {
+            "strategy_focus": "Confirm that graduate school is required or strongly rewarded before taking on cost.",
+            "best_actions": [
+                "check whether target roles require graduate school",
+                "compare program costs",
+                "review funding or assistantship options",
+                "talk to an advisor or someone in the field",
+                "compare graduate school against lower-cost alternatives"
+            ],
+            "avoid": [
+                "using graduate school to delay uncertainty",
+                "taking on debt without a target role",
+                "assuming an advanced degree guarantees employment"
+            ],
+        },
+        "Startup": {
+            "strategy_focus": "Validate the idea with real users before spending money or quitting stable work.",
+            "best_actions": [
+                "write the problem the startup solves",
+                "talk to 3 possible users",
+                "test a tiny version of the idea",
+                "avoid spending money early",
+                "define what evidence would prove the idea is worth continuing"
+            ],
+            "avoid": [
+                "building before validating the problem",
+                "spending money too early",
+                "confusing excitement with evidence"
+            ],
+        },
+    }
+
+    return profiles.get(
+        path_name,
+        {
+            "strategy_focus": "Test the path carefully before making a major commitment.",
+            "best_actions": [
+                "clarify the decision",
+                "compare the top path and backup path",
+                "check cost, time, and risk",
+                "get human feedback",
+                "choose one small next step"
+            ],
+            "avoid": [
+                "making a major decision without evidence",
+                "ignoring tradeoffs",
+                "treating the app as a final authority"
+            ],
+        },
+    )
