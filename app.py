@@ -10,14 +10,184 @@ from decision_engine import (
     get_main_warning,
     get_path_strategy_profile,
     get_result_reveal,
+    get_priority_impact,
+    get_option_aware_paths,
+    detect_critical_situation,
 )
-from ai_brain import generate_ai_summary
 
+from ai_brain import generate_ai_summary
 
 st.set_page_config(
     page_title="ClarityFlow AI",
     page_icon="🧠",
     layout="wide"
+)
+
+st.markdown(
+    """
+    <style>
+    /* Cyberpunk ClarityFlow theme */
+    html, body, [class*="css"] {
+        font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    }
+
+    /* Main app background */
+    .stApp {
+        background:
+            radial-gradient(circle at top left, rgba(0, 255, 255, 0.12), transparent 28%),
+            radial-gradient(circle at top right, rgba(255, 0, 200, 0.14), transparent 30%),
+            linear-gradient(135deg, #070711 0%, #0b1020 45%, #120019 100%);
+        color: #f5f7ff;
+    }
+
+    /* Headings */
+    h1, h2, h3 {
+        color: #ffffff;
+        letter-spacing: 0.02em;
+    }
+
+    h1 {
+        text-shadow: 0 0 14px rgba(0, 255, 255, 0.55);
+    }
+
+    h3 {
+        margin-top: 1.4rem;
+        margin-bottom: 0.5rem;
+        color: #7df9ff;
+    }
+
+    /* Regular text */
+    p, li, label, span {
+        color: #f5f7ff;
+    }
+
+    /* Info / warning boxes */
+    [data-testid="stAlert"] {
+        border-radius: 14px;
+        border: 1px solid rgba(125, 249, 255, 0.35);
+        box-shadow: 0 0 18px rgba(0, 255, 255, 0.08);
+    }
+
+    /* Buttons */
+    .stButton > button {
+        background: linear-gradient(90deg, #00f5ff, #ff00d4);
+        color: #050510;
+        border: none;
+        border-radius: 14px;
+        font-weight: 800;
+        letter-spacing: 0.03em;
+        box-shadow: 0 0 18px rgba(255, 0, 212, 0.35);
+        transition: 0.2s ease-in-out;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0 26px rgba(0, 245, 255, 0.55);
+    }
+
+    /* Inputs */
+    textarea, input {
+        background-color: #0d1224 !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(125, 249, 255, 0.45) !important;
+        border-radius: 12px !important;
+    }
+
+    textarea:focus, input:focus {
+        border-color: #ff00d4 !important;
+        box-shadow: 0 0 12px rgba(255, 0, 212, 0.35) !important;
+    }
+
+    /* Select boxes */
+    [data-baseweb="select"] > div {
+        background-color: #0d1224;
+        border-color: rgba(125, 249, 255, 0.45);
+        color: #ffffff;
+        border-radius: 12px;
+    }
+
+    /* Sliders */
+    [data-testid="stSlider"] {
+        color: #7df9ff;
+    }
+
+    /* Metric cards */
+    [data-testid="stMetric"] {
+        background: rgba(13, 18, 36, 0.72);
+        border: 1px solid rgba(125, 249, 255, 0.24);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 0 16px rgba(0, 255, 255, 0.08);
+    }
+
+    [data-testid="stMetricLabel"] {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #7df9ff;
+    }
+
+    [data-testid="stMetricValue"] {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1.1;
+        color: #ffffff;
+        text-shadow: 0 0 12px rgba(255, 0, 212, 0.35);
+    }
+
+    /* Expanders */
+    [data-testid="stExpander"] {
+        background: rgba(13, 18, 36, 0.55);
+        border: 1px solid rgba(125, 249, 255, 0.20);
+        border-radius: 14px;
+        box-shadow: 0 0 14px rgba(0, 245, 255, 0.06);
+    }
+
+    /* Dataframes */
+    [data-testid="stDataFrame"] {
+        margin-top: 0.5rem;
+        border-radius: 14px;
+        box-shadow: 0 0 18px rgba(0, 255, 255, 0.08);
+    }
+
+    /* AI Strategy Plan text size */
+    .ai-strategy-text {
+        font-size: 1.08rem;
+        line-height: 1.65;
+    }
+
+    .ai-strategy-text p,
+    .ai-strategy-text li {
+        font-size: 1.08rem;
+        line-height: 1.65;
+    }
+
+    .ai-strategy-text h3 {
+        font-size: 1.35rem;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #7df9ff;
+        text-shadow: 0 0 10px rgba(0, 245, 255, 0.35);
+    }
+
+    @media (max-width: 768px) {
+        .ai-strategy-text,
+        .ai-strategy-text p,
+        .ai-strategy-text li {
+            font-size: 1.15rem;
+            line-height: 1.7;
+        }
+
+        .ai-strategy-text h3 {
+            font-size: 1.45rem;
+        }
+
+        [data-testid="stMetricValue"] {
+            font-size: 1.7rem;
+        }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
 
 st.title("ClarityFlow AI")
@@ -30,9 +200,9 @@ st.write(
 )
 
 st.info(
-    "Responsible AI note: This tool supports decision-making, but it does not make "
-    "final life decisions for you. Review major choices with a mentor, advisor, "
-    "or trusted person."
+    "Responsible AI note: ClarityFlow supports decision-making, but it does not make "
+    "final life or career commitments for the user. Review major choices with a mentor, "
+    "advisor, counselor, workforce worker, or trusted human."
 )
 
 st.divider()
@@ -135,6 +305,34 @@ if st.button("Build My Plan", type="primary"):
         )
         st.stop()
 
+    critical_alert = detect_critical_situation(
+        f"{decision_question} {career_goal}"
+    )
+
+    if critical_alert["is_critical"]:
+        categories = ", ".join(critical_alert["categories"])
+
+        st.warning("Stability-first notice")
+
+        st.info(
+            "Your message may involve an urgent stability or safety concern: "
+            f"{categories}. Your career goals still matter, but immediate stability "
+            "should come first."
+        )
+
+        st.warning(
+            "ClarityFlow will keep this plan small, realistic, and focused. "
+            "Before making major commitments like quitting a job, moving, enrolling, "
+            "taking on debt, or accepting risky work, consider connecting with a trusted "
+            "human, shelter or housing support, clinic, benefits office, school counselor, "
+            "workforce center, or emergency service if you are in immediate danger."
+        )
+
+        st.caption(
+            "This does not stop the decision map. It helps keep the next steps safer "
+            "and more realistic for high-pressure situations."
+        )
+
     career_paths = load_career_paths()
 
     user_weights = {
@@ -145,37 +343,102 @@ if st.button("Build My Plan", type="primary"):
         "credential_importance": credential_importance,
     }
 
-    results = score_paths(career_paths, user_weights)
+    option_awareness = get_option_aware_paths(decision_question)
+    relevant_paths = option_awareness["relevant_paths"]
+
+    if len(relevant_paths) >= 2:
+        scoring_paths = career_paths[career_paths["path"].isin(relevant_paths)]
+    else:
+        scoring_paths = career_paths
+
+    results = score_paths(scoring_paths, user_weights)
     top_path, backup_path = get_top_paths(results)
 
     reveal = get_result_reveal(top_path["path"])
 
-    st.markdown(
-        f"""
-        <div style="
-            border-radius: 18px;
-            padding: 28px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #f4f7ff, #ffffff);
-            border: 1px solid #d9e2ff;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-            text-align: center;
-        ">
-            <div style="font-size: 54px;">{reveal["icon"]}</div>
-            <div style="font-size: 18px; font-weight: 600; color: #555;">
-                Your Starting Direction
-            </div>
-            <div style="font-size: 42px; font-weight: 800; margin-top: 6px; color: #111;">
-                {reveal["title"]}
-            </div>
-            <div style="font-size: 18px; margin-top: 12px; color: #444;">
-                {reveal["message"]}
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    card_html = f"""<div style="
+border-radius: 22px;
+padding: 32px;
+margin-top: 24px;
+margin-bottom: 24px;
+background:
+    linear-gradient(135deg, rgba(13, 18, 36, 0.96), rgba(28, 0, 45, 0.94)),
+    radial-gradient(circle at top left, rgba(0, 245, 255, 0.25), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(255, 0, 212, 0.22), transparent 35%);
+border: 1px solid rgba(125, 249, 255, 0.55);
+box-shadow:
+    0 0 30px rgba(0, 245, 255, 0.20),
+    inset 0 0 22px rgba(255, 0, 212, 0.08);
+text-align: center;
+position: relative;
+overflow: hidden;
+">
+<div style="
+font-size: 13px;
+color: #7df9ff;
+letter-spacing: 0.22em;
+text-transform: uppercase;
+margin-bottom: 14px;
+text-shadow: 0 0 10px rgba(0, 245, 255, 0.55);
+">
+ClarityFlow Decision Scan
+</div>
+
+<div style="
+font-size: 58px;
+margin-bottom: 8px;
+filter: drop-shadow(0 0 12px rgba(255, 0, 212, 0.45));
+">
+{reveal["icon"]}
+</div>
+
+<div style="
+font-size: 17px;
+font-weight: 700;
+color: #7df9ff;
+margin-top: 4px;
+text-shadow: 0 0 10px rgba(0, 245, 255, 0.45);
+">
+Your Starting Direction
+</div>
+
+<div style="
+font-size: 46px;
+font-weight: 900;
+margin-top: 8px;
+color: #ffffff;
+text-shadow:
+    0 0 14px rgba(0, 245, 255, 0.45),
+    0 0 22px rgba(255, 0, 212, 0.25);
+">
+{reveal["title"]}
+</div>
+
+<div style="
+font-size: 18px;
+margin-top: 14px;
+color: #f5f7ff;
+max-width: 760px;
+margin-left: auto;
+margin-right: auto;
+line-height: 1.6;
+">
+{reveal["message"]}
+</div>
+
+<div style="
+margin-top: 22px;
+height: 3px;
+width: 72%;
+margin-left: auto;
+margin-right: auto;
+border-radius: 999px;
+background: linear-gradient(90deg, transparent, #00f5ff, #ff00d4, transparent);
+box-shadow: 0 0 16px rgba(0, 245, 255, 0.55);
+"></div>
+</div>"""
+
+    st.markdown(card_html, unsafe_allow_html=True)
 
     st.subheader("Your Starting Plan")
 
@@ -189,60 +452,108 @@ if st.button("Build My Plan", type="primary"):
         "It combines your priorities with the career path data."
     )
 
-    metric_col1, metric_col2, metric_col3 = st.columns(3)
+    metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
 
     with metric_col1:
         st.metric("Overall Match", f"{top_path['fit_percent']}%")
 
     with metric_col2:
-        st.metric("Recommendation Confidence", top_path["confidence_level"])
+        st.metric("Confidence", top_path["confidence_level"])
 
     with metric_col3:
-        st.metric("Decision Clarity", top_path["decision_clarity_level"])
-
-    metric_col4, metric_col5, metric_col6 = st.columns(3)
+        st.metric("Life Pressure", top_path["pressure_level"])
 
     with metric_col4:
-        st.metric("Momentum Multiplier", top_path["momentum_level"])
-
-    with metric_col5:
-        st.metric("Life Pressure Level", top_path["pressure_level"])
-
-    with metric_col6:
         st.metric("Risk Exposure", top_path["risk_exposure"])
 
-    metric_col7, metric_col8 = st.columns(2)
+    with st.expander("Why did I get this result?"):
+        st.write("### Options Detected")
 
-    with metric_col7:
-        st.metric("Multiplier Score", top_path["momentum_multiplier"])
+        if option_awareness["detected_options"]:
+            for detected_option in option_awareness["detected_options"]:
+                matched_paths = ", ".join(detected_option["matched_paths"])
+                st.info(
+                    f"**{detected_option['option']}** appears connected to: {matched_paths}"
+                )
+        elif relevant_paths:
+            st.info(
+                "The app detected career signals in your decision question: "
+                + ", ".join(relevant_paths)
+            )
+        else:
+            st.caption(
+                "No specific option keywords were detected, so the app used the full career path comparison."
+            )
 
-    with metric_col8:
-        st.metric("Cost Stress", top_path["affordability_stress"])
+        st.write("### What Your Priorities Changed")
 
-    with st.expander("What do these numbers mean?"):
+        for impact in get_priority_impact(user_weights):
+            st.write(f"- {impact}")
+
+        st.write("### Overall Match Breakdown")
+
+        st.caption(
+            "This shows which priority factors had the strongest effect on the top recommendation."
+        )
+
+        breakdown_data = [
+            {
+                "Factor": "Income speed",
+                "Impact": top_path["income_impact"],
+                "Score contribution": top_path["income_contribution"],
+            },
+            {
+                "Factor": "Budget fit",
+                "Impact": top_path["budget_impact"],
+                "Score contribution": top_path["budget_contribution"],
+            },
+            {
+                "Factor": "Flexibility fit",
+                "Impact": top_path["flexibility_impact"],
+                "Score contribution": top_path["flexibility_contribution"],
+            },
+            {
+                "Factor": "Risk safety",
+                "Impact": top_path["risk_impact"],
+                "Score contribution": top_path["risk_contribution"],
+            },
+            {
+                "Factor": "Credential match",
+                "Impact": top_path["credential_impact"],
+                "Score contribution": top_path["credential_contribution"],
+            },
+        ]
+
+        st.dataframe(breakdown_data, width="stretch", hide_index=True)
+
+    with st.expander("View advanced decision metrics"):
+        adv_col1, adv_col2, adv_col3, adv_col4 = st.columns(4)
+
+        with adv_col1:
+            st.metric("Decision Clarity", top_path["decision_clarity_level"])
+
+        with adv_col2:
+            st.metric("Momentum", top_path["momentum_level"])
+
+        with adv_col3:
+            st.metric("Multiplier Score", top_path["momentum_multiplier"])
+
+        with adv_col4:
+            st.metric("Cost Stress", top_path["affordability_stress"])
+
         st.markdown(
             """
             **Overall Match** shows how well the top path matches your current priorities.
 
-            **Recommendation Confidence** shows how far ahead the top path is compared to the backup path.  
-            If confidence is low, the top two paths are close and should be compared carefully.
+            **Confidence** shows how far ahead the top path is compared to the backup path.
 
-            **Decision Clarity** uses a Gini-inspired score spread to check whether one path clearly stands out across all options.  
-            If clarity is low, the path scores are close together and the user should compare options carefully.
+            **Decision Clarity** checks whether one path clearly stands out or whether the top options are close.
 
-            **Momentum Multiplier** is inspired by the economic multiplier idea.  
-            Instead of measuring GDP change from spending, ClarityFlow estimates how much career movement a path may create compared to its initial cost, time, and risk.
+            **Momentum** estimates how much career movement a path may create compared to cost, time, and risk.
 
-            **Multiplier Score** is the numeric version of that idea.  
-            Higher numbers suggest the path may create more momentum for less initial burden, but it is still an estimate, not a guaranteed outcome.
+            **Life Pressure** reflects income urgency, budget pressure, flexibility needs, and risk concerns.
 
-            **Life Pressure Level** shows how much pressure you may be under based on income urgency, budget, flexibility needs, and risk concerns.
-
-            **Cost Stress** shows how financially stressful this path may be based on the path cost and your budget pressure.  
-            Higher numbers mean the path may need more caution around cost, debt, or payment commitments.
-
-            **Risk Exposure** shows how risky this path may feel based on the path risk level and your income/budget pressure.  
-            Higher numbers mean the path should be tested carefully before making a major commitment.
+            **Risk Exposure** shows how risky this path may feel under your current income and budget pressure.
             """
         )
 
@@ -263,14 +574,31 @@ if st.button("Build My Plan", type="primary"):
         response_mode,
     )
 
-    st.markdown(ai_summary)
+    st.markdown(
+        f"""
+        <div class="ai-strategy-text">
+        {ai_summary}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-    st.write("### Reality Check")
-    st.warning(get_reality_check(top_path["path"]))
+    with st.expander("Reality Check"):
+        st.warning(get_reality_check(top_path["path"]))
 
-    st.caption(
-        "This ranking is based on general pathway assumptions and your current priority sliders. "
-        "It does not guarantee income, job placement, program quality, or future success."
+        st.caption(
+            "This ranking is based on general pathway assumptions and your current priority sliders. "
+            "It does not guarantee income, job placement, program quality, or future success."
+        )
+
+    st.write("### Human Review Before Committing")
+
+    st.warning(
+        "ClarityFlow can help compare options and create a decision map, but it should not "
+        "make final life or career commitments for the user. Before quitting a job, moving, "
+        "enrolling in a paid program, taking on debt, accepting a job, or making a major "
+        "change, review the plan with a mentor, advisor, counselor, workforce worker, "
+        "or trusted human."
     )
 
     with st.expander("Optional: View Decision Map + scoring details"):
@@ -289,6 +617,7 @@ if st.button("Build My Plan", type="primary"):
                 "path",
                 "fit_percent",
                 "confidence_level",
+                "confidence_gap_percent",
                 "decision_clarity_index",
                 "decision_clarity_level",
                 "momentum_multiplier",

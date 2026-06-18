@@ -21,14 +21,14 @@ def get_pressure_level(pressure_score):
         return "Low"
 
 
-def get_confidence_level(confidence_gap):
+def get_confidence_level(confidence_gap_percent):
     """
-    Converts the gap between the top two paths into a confidence label.
-    A small gap means the user should compare both paths carefully.
+    Converts the percent gap between the top two paths into a confidence label.
+    A small percent gap means the user should compare both paths carefully.
     """
-    if confidence_gap >= 15:
+    if confidence_gap_percent >= 25:
         return "Strong"
-    elif confidence_gap >= 7:
+    elif confidence_gap_percent >= 10:
         return "Moderate"
     else:
         return "Low"
@@ -87,6 +87,22 @@ def get_momentum_level(momentum_multiplier):
     else:
         return "Low"
 
+def get_factor_impact_label(value):
+    """
+    Converts a factor contribution into a simple user-facing impact label.
+    """
+
+    if value >= 40:
+        return "Very high impact"
+    elif value >= 25:
+        return "High impact"
+    elif value >= 12:
+        return "Moderate impact"
+    elif value > 0:
+        return "Low impact"
+    else:
+        return "No impact"
+
 
 def score_paths(career_paths, user_weights):
     """
@@ -110,13 +126,50 @@ def score_paths(career_paths, user_weights):
 
     # Main fit score.
     # User sliders are 1-10.
-    scored_paths["fit_score"] = (
+    # Each contribution shows how much that factor affected the overall match.
+    scored_paths["income_contribution"] = (
         scored_paths["income_speed"] * user_weights["income_urgency"]
-        + scored_paths["affordability_score"] * user_weights["budget_sensitivity"]
-        + scored_paths["flexibility"] * user_weights["flexibility_need"]
-        + scored_paths["safety_score"] * user_weights["risk_aversion"]
-        + scored_paths["credential_strength"] * user_weights["credential_importance"]
     )
+
+    scored_paths["budget_contribution"] = (
+        scored_paths["affordability_score"] * user_weights["budget_sensitivity"]
+    )
+
+    scored_paths["flexibility_contribution"] = (
+        scored_paths["flexibility"] * user_weights["flexibility_need"]
+    )
+
+    scored_paths["risk_contribution"] = (
+        scored_paths["safety_score"] * user_weights["risk_aversion"]
+    )
+
+    scored_paths["credential_contribution"] = (
+        scored_paths["credential_strength"] * user_weights["credential_importance"]
+    )
+
+    scored_paths["fit_score"] = (
+        scored_paths["income_contribution"]
+        + scored_paths["budget_contribution"]
+        + scored_paths["flexibility_contribution"]
+        + scored_paths["risk_contribution"]
+        + scored_paths["credential_contribution"]
+    )
+
+    scored_paths["income_impact"] = scored_paths["income_contribution"].apply(
+        get_factor_impact_label
+    )
+    scored_paths["budget_impact"] = scored_paths["budget_contribution"].apply(
+        get_factor_impact_label
+    )
+    scored_paths["flexibility_impact"] = scored_paths[
+        "flexibility_contribution"
+    ].apply(get_factor_impact_label)
+    scored_paths["risk_impact"] = scored_paths["risk_contribution"].apply(
+        get_factor_impact_label
+    )
+    scored_paths["credential_impact"] = scored_paths[
+        "credential_contribution"
+    ].apply(get_factor_impact_label)
 
     # Maximum possible fit score:
     # each career path factor maxes at 5, and each user slider maxes at 10.
@@ -202,16 +255,26 @@ def score_paths(career_paths, user_weights):
     scored_paths["rank"] = range(1, len(scored_paths) + 1)
 
     # Confidence level:
-    # based on how far ahead the top path is from the backup path.
+    # based on the percent gap between the top path and backup path.
+    # This is better than raw difference because a 10-point gap means
+    # different things depending on how large the top score is.
     if len(scored_paths) > 1:
         top_score = scored_paths.iloc[0]["fit_score"]
         second_score = scored_paths.iloc[1]["fit_score"]
+
         confidence_gap = top_score - second_score
+
+        if top_score > 0:
+            confidence_gap_percent = (confidence_gap / top_score) * 100
+        else:
+            confidence_gap_percent = 0
     else:
         confidence_gap = 0
+        confidence_gap_percent = 0
 
     scored_paths["confidence_gap"] = round(confidence_gap, 1)
-    scored_paths["confidence_level"] = get_confidence_level(confidence_gap)
+    scored_paths["confidence_gap_percent"] = round(confidence_gap_percent, 1)
+    scored_paths["confidence_level"] = get_confidence_level(confidence_gap_percent)
 
     # Keep old "score" column so the rest of the app does not break.
     scored_paths["score"] = scored_paths["fit_score"]

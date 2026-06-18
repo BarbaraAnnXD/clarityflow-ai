@@ -1,3 +1,5 @@
+import re
+
 def get_top_paths(results):
     """
     Returns the top recommended path and backup path.
@@ -277,3 +279,285 @@ def get_result_reveal(path_name):
             "message": "Use this as a starting direction, then test the next small step.",
         },
     )
+
+def get_priority_impact(user_weights):
+    """
+    Explains how the user's slider choices affected the recommendation.
+    This makes the scoring engine more transparent.
+    """
+
+    impacts = []
+
+    income = user_weights["income_urgency"]
+    budget = user_weights["budget_sensitivity"]
+    flexibility = user_weights["flexibility_need"]
+    risk = user_weights["risk_aversion"]
+    credential = user_weights["credential_importance"]
+
+    if income >= 7:
+        impacts.append(
+            "High income urgency pushed the app toward options that can create income sooner."
+        )
+    elif income <= 3:
+        impacts.append(
+            "Lower income urgency allowed the app to consider longer-term paths more fairly."
+        )
+    else:
+        impacts.append(
+            "Moderate income urgency kept both short-term and long-term options in play."
+        )
+
+    if budget >= 7:
+        impacts.append(
+            "High budget sensitivity lowered the strength of expensive paths."
+        )
+    elif budget <= 3:
+        impacts.append(
+            "Lower budget pressure allowed higher-cost paths to stay more competitive."
+        )
+    else:
+        impacts.append(
+            "Moderate budget pressure made cost important, but not the only deciding factor."
+        )
+
+    if flexibility >= 7:
+        impacts.append(
+            "High flexibility needs favored paths that can fit around work, family, or life responsibilities."
+        )
+    elif flexibility <= 3:
+        impacts.append(
+            "Lower flexibility needs allowed more structured paths to stay competitive."
+        )
+    else:
+        impacts.append(
+            "Moderate flexibility needs kept both structured and flexible paths in the comparison."
+        )
+
+    if risk >= 7:
+        impacts.append(
+            "High risk aversion pushed the app away from unstable or uncertain paths."
+        )
+    elif risk <= 3:
+        impacts.append(
+            "Lower risk aversion allowed higher-risk paths to stay in the decision map."
+        )
+    else:
+        impacts.append(
+            "Moderate risk aversion kept safer options important without removing all risk."
+        )
+
+    if credential >= 7:
+        impacts.append(
+            "High credential importance increased the value of paths with formal proof, like degrees or certificates."
+        )
+    elif credential <= 3:
+        impacts.append(
+            "Lower credential importance gave more weight to skills, projects, experience, and faster action."
+        )
+    else:
+        impacts.append(
+            "Moderate credential importance kept both formal credentials and skill-building paths relevant."
+        )
+
+    return impacts
+
+def get_option_aware_paths(decision_question):
+    """
+    Looks at the user's typed decision and maps real options to likely career path types.
+    This helps the app consider the user's actual question before scoring.
+    """
+
+    text = decision_question.lower()
+
+    option_patterns = [
+        r"between (.+?) and (.+)",
+        r"between (.+?) or (.+)",
+        r"should i (.+?) or (.+)",
+        r"stuck between (.+?) and (.+)",
+        r"choose between (.+?) and (.+)",
+    ]
+
+    detected_options = []
+
+    for pattern in option_patterns:
+        match = re.search(pattern, text)
+        if match:
+            detected_options = [
+                match.group(1).strip(" .?"),
+                match.group(2).strip(" .?"),
+            ]
+            break
+
+    keyword_map = {
+        "Degree": [
+            "degree",
+            "college",
+            "university",
+            "school",
+            "bachelor",
+            "associate",
+            "class",
+            "semester",
+        ],
+        "Bootcamp": [
+            "bootcamp",
+            "boot camp",
+            "training program",
+            "certification program",
+            "fast program",
+        ],
+        "Self-Taught": [
+            "self taught",
+            "teach myself",
+            "learn myself",
+            "cybersecurity",
+            "coding",
+            "programming",
+            "data analytics",
+            "python",
+            "github",
+            "portfolio",
+            "tech",
+            "computer",
+            "computer engineering",
+        ],
+        "Job Now": [
+            "job",
+            "work",
+            "autozone",
+            "butcher",
+            "warehouse",
+            "retail",
+            "restaurant",
+            "income",
+            "paycheck",
+            "hired",
+            "apply",
+            "employment",
+        ],
+        "Graduate School": [
+            "graduate school",
+            "masters",
+            "master's",
+            "phd",
+            "advanced degree",
+        ],
+        "Startup": [
+            "startup",
+            "business",
+            "company",
+            "entrepreneur",
+            "refurbish",
+            "refurbishing",
+            "houses",
+            "real estate",
+            "flip houses",
+            "side hustle",
+        ],
+    }
+
+    option_profiles = []
+    relevant_paths = set()
+
+    if detected_options:
+        for option in detected_options:
+            matched_paths = []
+
+            for path_name, keywords in keyword_map.items():
+                if any(keyword in option.lower() for keyword in keywords):
+                    matched_paths.append(path_name)
+                    relevant_paths.add(path_name)
+
+            if not matched_paths:
+                matched_paths.append("Needs review")
+
+            option_profiles.append(
+                {
+                    "option": option.title(),
+                    "matched_paths": matched_paths,
+                }
+            )
+    else:
+        for path_name, keywords in keyword_map.items():
+            if any(keyword in text for keyword in keywords):
+                relevant_paths.add(path_name)
+
+    return {
+        "detected_options": option_profiles,
+        "relevant_paths": list(relevant_paths),
+    }
+
+
+def detect_critical_situation(user_text):
+    """
+    Detects high-pressure or stability-first situations in the user's text.
+
+    This does not diagnose, solve, or stop the decision map.
+    It helps the app remind the user that immediate stability, safety,
+    housing, food, medical, or human support may need to come first.
+    """
+
+    text = user_text.lower()
+
+    critical_keywords = {
+        "housing instability": [
+            "evicted",
+            "eviction",
+            "homeless",
+            "no place to stay",
+            "kicked out",
+            "shelter",
+            "sleeping in my car",
+            "living in my car",
+            "unsafe housing",
+            "about to lose my home",
+            "lose my housing",
+        ],
+        "medical or pregnancy risk": [
+            "medical emergency",
+            "hospital",
+            "pregnant",
+            "pregnancy",
+            "no doctor",
+            "medicine",
+            "medication",
+            "injury",
+            "hurt",
+            "bleeding",
+        ],
+        "food or basic needs": [
+            "no food",
+            "hungry",
+            "can't eat",
+            "cannot eat",
+            "no money for food",
+            "no transportation",
+            "no ride",
+            "utilities shut off",
+            "lights shut off",
+            "water shut off",
+        ],
+        "abuse or immediate safety": [
+            "abuse",
+            "abusive",
+            "domestic violence",
+            "unsafe",
+            "threatened",
+            "trafficking",
+            "stalking",
+            "assault",
+            "violence",
+            "hurt me",
+        ],
+    }
+
+    matched_categories = []
+
+    for category, keywords in critical_keywords.items():
+        if any(keyword in text for keyword in keywords):
+            matched_categories.append(category)
+
+    return {
+        "is_critical": len(matched_categories) > 0,
+        "categories": matched_categories,
+    }
