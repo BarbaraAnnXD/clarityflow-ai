@@ -224,21 +224,21 @@ career_goal = st.text_input(
     )
 )
 
-st.subheader("Priority Check")
+st.subheader("What matters most right now?")
 st.caption(
-    "Move the sliders based on what feels true right now. "
-    "ClarityFlow uses these behind the scenes to compare tradeoffs."
+    "Move the sliders based on your real life right now. "
+    "There are no perfect answers — this just helps ClarityFlow compare your options."
 )
 
 col1, col2 = st.columns(2)
 
 with col1:
     income_urgency = st.slider(
-        "How soon do you need income?",
+        "How quickly do you need your next paycheck?",
         1,
         10,
         5,
-        help="1 = no rush, 10 = I need income as soon as possible"
+        help="1 = Money is not urgent, 10 = I need income as soon as possible"
     )
 
     budget_sensitivity = st.slider(
@@ -246,15 +246,18 @@ with col1:
         1,
         10,
         5,
-        help="1 = I can invest money, 10 = I need low-cost options"
+        help="1 = I can spend/invest money, 10 = I need the lowest-cost option"
     )
 
     flexibility_need = st.slider(
-        "How much flexibility do you need?",
+        "How much control do you need over your schedule?",
         1,
         10,
         5,
-        help="1 = I can follow a fixed schedule, 10 = I need flexibility around life/work/family"
+        help=(
+            "1 = I can follow a fixed schedule, "
+            "10 = I need control around work, family, transportation, or childcare"
+        )
     )
 
 with col2:
@@ -263,15 +266,15 @@ with col2:
         1,
         10,
         5,
-        help="1 = I can handle uncertainty, 10 = I need the safer path"
+        help="1 = I can handle uncertainty, 10 = I need the option with less risk"
     )
 
     credential_importance = st.slider(
-        "How important is a formal credential?",
+        "How much do you need a degree or certificate?",
         1,
         10,
         5,
-        help="1 = skills/projects matter more, 10 = degree/certificate proof matters a lot"
+        help="1 = skills/projects matter more, 10 = formal proof matters a lot"
     )
 
 st.subheader("Clarity Mode")
