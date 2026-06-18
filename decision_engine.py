@@ -231,3 +231,49 @@ def get_path_strategy_profile(path_name):
             ],
         },
     )
+def get_result_reveal(path_name):
+    """
+    Creates a memorable result reveal card for the user's strongest starting path.
+    """
+
+    reveals = {
+        "Job Now": {
+            "icon": "💼",
+            "title": "Job Now",
+            "message": "Stabilize income first, then protect time for your next move.",
+        },
+        "Self-Taught": {
+            "icon": "💻",
+            "title": "Self-Taught",
+            "message": "Build proof of skill through a small project and consistent practice.",
+        },
+        "Bootcamp": {
+            "icon": "🚀",
+            "title": "Bootcamp",
+            "message": "Move faster, but verify cost, quality, and job outcomes before committing.",
+        },
+        "Degree": {
+            "icon": "🎓",
+            "title": "Degree",
+            "message": "Use a formal credential to build long-term career stability.",
+        },
+        "Graduate School": {
+            "icon": "📚",
+            "title": "Graduate School",
+            "message": "Only move forward if the advanced credential clearly supports your target role.",
+        },
+        "Startup": {
+            "icon": "💡",
+            "title": "Startup",
+            "message": "Test the idea with real people before spending heavily or taking big risks.",
+        },
+    }
+
+    return reveals.get(
+        path_name,
+        {
+            "icon": "🧭",
+            "title": path_name,
+            "message": "Use this as a starting direction, then test the next small step.",
+        },
+    )

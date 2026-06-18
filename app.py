@@ -1,13 +1,15 @@
 import streamlit as st
+import json
+from datetime import datetime
 
 from econ_mode import load_career_paths, score_paths
 from decision_engine import (
     get_top_paths,
     get_tradeoffs,
     get_reality_check,
-    get_confidence_boost,
     get_main_warning,
     get_path_strategy_profile,
+    get_result_reveal,
 )
 from ai_brain import generate_ai_summary
 
@@ -102,6 +104,22 @@ with col2:
         help="1 = skills/projects matter more, 10 = degree/certificate proof matters a lot"
     )
 
+st.subheader("Clarity Mode")
+
+response_mode = st.selectbox(
+    "How do you want ClarityFlow to guide you?",
+    [
+        "Direct Mode — clear answer fast",
+        "Coach Mode — supportive and steady",
+        "Analyst Mode — explain the tradeoffs",
+        "Checklist Mode — action steps only",
+    ],
+    help=(
+        "This changes how the AI explains the decision map. "
+        "The scoring engine stays the same."
+    ),
+)
+
 st.caption(
     "Behind the scenes: the app compares cost, time, risk, flexibility, "
     "credential strength, and income speed."
@@ -130,8 +148,36 @@ if st.button("Build My Plan", type="primary"):
     results = score_paths(career_paths, user_weights)
     top_path, backup_path = get_top_paths(results)
 
+    reveal = get_result_reveal(top_path["path"])
+
+    st.markdown(
+        f"""
+        <div style="
+            border-radius: 18px;
+            padding: 28px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #f4f7ff, #ffffff);
+            border: 1px solid #d9e2ff;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+            text-align: center;
+        ">
+            <div style="font-size: 54px;">{reveal["icon"]}</div>
+            <div style="font-size: 18px; font-weight: 600; color: #555;">
+                Your Starting Direction
+            </div>
+            <div style="font-size: 42px; font-weight: 800; margin-top: 6px; color: #111;">
+                {reveal["title"]}
+            </div>
+            <div style="font-size: 18px; margin-top: 12px; color: #444;">
+                {reveal["message"]}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     st.subheader("Your Starting Plan")
-    st.success(f"Strongest starting path right now: **{top_path['path']}**")
 
     if backup_path is not None:
         st.info(f"Backup path to compare: **{backup_path['path']}**")
@@ -202,7 +248,7 @@ if st.button("Build My Plan", type="primary"):
 
     st.write("### Main Warning")
     st.warning(get_main_warning(top_path))
-    
+
     st.write("### AI Strategy Plan")
 
     path_strategy_profile = get_path_strategy_profile(top_path["path"])
@@ -214,7 +260,9 @@ if st.button("Build My Plan", type="primary"):
         backup_path,
         results,
         path_strategy_profile,
+        response_mode,
     )
+
     st.markdown(ai_summary)
 
     st.write("### Reality Check")
@@ -224,7 +272,7 @@ if st.button("Build My Plan", type="primary"):
         "This ranking is based on general pathway assumptions and your current priority sliders. "
         "It does not guarantee income, job placement, program quality, or future success."
     )
-    
+
     with st.expander("Optional: View Decision Map + scoring details"):
         st.write("### Why this path surfaced")
         st.write(top_path["notes"])
@@ -259,3 +307,89 @@ if st.button("Build My Plan", type="primary"):
         ].reset_index(drop=True)
 
         st.dataframe(display_results, width="stretch", hide_index=True)
+
+    st.divider()
+
+    st.write("### Report Wrong or Harmful Output")
+
+    st.caption(
+        "Use this after reviewing the result. If the plan feels unsafe, biased, "
+        "unrealistic, confusing, incorrect, or too confident, you can create a report."
+    )
+
+    with st.expander("Report this output"):
+        st.warning(
+            "Do not include private details, addresses, passwords, medical records, "
+            "or emergency information. If this is an emergency, contact local emergency "
+            "services or a trusted human support professional."
+        )
+
+        report_type = st.selectbox(
+            "What kind of issue did you notice?",
+            [
+                "Wrong recommendation",
+                "Unsafe advice",
+                "Biased or unfair output",
+                "Too confident",
+                "Confusing explanation",
+                "Checklist not realistic",
+                "Other",
+            ],
+        )
+
+        report_severity = st.selectbox(
+            "How serious is the issue?",
+            [
+                "Low - wording issue",
+                "Medium - could confuse someone",
+                "High - could cause harm if followed",
+            ],
+        )
+
+        report_notes = st.text_area(
+            "Describe what felt wrong or harmful.",
+            placeholder=(
+                "Example: The app recommended an expensive path even though "
+                "the user had a very tight budget."
+            ),
+            height=120,
+        )
+
+        report_data = {
+            "timestamp": datetime.now().isoformat(),
+            "reported_issue_type": report_type,
+            "severity": report_severity,
+            "user_decision_question": decision_question,
+            "career_goal": career_goal,
+            "top_path": top_path["path"],
+            "backup_path": backup_path["path"] if backup_path is not None else "None",
+            "overall_match": float(top_path["fit_percent"]),
+            "confidence_level": top_path["confidence_level"],
+            "decision_clarity": top_path["decision_clarity_level"],
+            "life_pressure_level": top_path["pressure_level"],
+            "cost_stress": float(top_path["affordability_stress"]),
+            "risk_exposure": float(top_path["risk_exposure"]),
+            "report_notes": report_notes,
+        }
+
+        st.download_button(
+            label="Download Report File",
+            data=json.dumps(report_data, indent=2),
+            file_name="clarityflow_output_report.json",
+            mime="application/json",
+        )
+
+        st.markdown(
+            """
+            After downloading the report file, email it to:
+
+            **clarityflow.reports@example.com**
+
+            [Open email draft](mailto:clarityflow.reports@example.com?subject=ClarityFlow%20Output%20Report&body=Please%20attach%20the%20downloaded%20clarityflow_output_report.json%20file%20to%20this%20email.)
+            """
+        )
+
+        st.caption(
+            "Prototype note: In a full version, this report would go to a human review queue. "
+            "For this demo, the user downloads the report and emails it for review."
+        )
