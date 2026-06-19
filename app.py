@@ -213,6 +213,23 @@ st.markdown(
         color: #7df9ff;
     }
 
+    /* Slider min/max labels */
+    .slider-scale {
+        display: flex;
+        justify-content: space-between;
+        margin-top: -0.6rem;
+        margin-bottom: 1.3rem;
+        color: #f5f7ff;
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+
+    .slider-scale span {
+        color: #f5f7ff;
+        font-size: 1.05rem;
+        font-weight: 700;
+    }
+
     /* Metric cards */
     [data-testid="stMetric"] {
         background: rgba(13, 18, 36, 0.72);
@@ -344,6 +361,11 @@ with col1:
         5,
         help="1 = Money is not urgent, 10 = I need income as soon as possible"
     )
+    
+    st.markdown(
+        '<div class="slider-scale"><span>1 Not Urgent</span><span>Need ASAP 10</span></div>',
+        unsafe_allow_html=True
+    )
 
     budget_sensitivity = st.slider(
         "How tight is your budget?",
@@ -351,6 +373,11 @@ with col1:
         10,
         5,
         help="1 = I can spend/invest money, 10 = I need the lowest-cost option"
+    )
+
+    st.markdown(
+        '<div class="slider-scale"><span>1 Comfortable</span><span>Breaking Point 10</span></div>',
+        unsafe_allow_html=True
     )
 
     flexibility_need = st.slider(
@@ -364,6 +391,11 @@ with col1:
         )
     )
 
+    st.markdown(
+        '<div class="slider-scale"><span>1 Zero Preference</span><span>Complete Sovereignty 10</span></div>',
+        unsafe_allow_html=True
+    )
+
 with col2:
     risk_aversion = st.slider(
         "How much do you want to avoid risk?",
@@ -373,12 +405,22 @@ with col2:
         help="1 = I can handle uncertainty, 10 = I need the option with less risk"
     )
 
+    st.markdown(
+        '<div class="slider-scale"><span>1 Risk Seeker</span><span>Zero Tolerance 10</span></div>',
+        unsafe_allow_html=True
+    )
+
     credential_importance = st.slider(
         "How much do you need a degree or certificate?",
         1,
         10,
         5,
         help="1 = skills/projects matter more, 10 = formal proof matters a lot"
+    )
+
+    st.markdown(
+        '<div class="slider-scale"><span>1 Entirely Optional</span><span>Absolute Mandate 10</span></div>',
+        unsafe_allow_html=True
     )
 
 st.markdown('<div class="section-title">Clarity Mode</div>', unsafe_allow_html=True)
