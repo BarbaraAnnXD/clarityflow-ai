@@ -4,6 +4,14 @@ ClarityFlow AI is a web-based career decision simulator that helps students, you
 
 Instead of giving generic AI advice, ClarityFlow combines a transparent ECON-inspired scoring engine with an AI explanation layer. The scoring engine ranks possible career paths first, then the AI explains the result, compares the user’s real options, and creates a practical 7-day evidence-gathering plan.
 
+## Track and Challenge
+
+**Track:** Undergraduate Track — AI for Life & Work
+**Mission Lane:** Productivity
+**Challenge Direction:** Direction A: Life Decision Simulator
+
+ClarityFlow AI helps students, early professionals, and career changers compare major career paths by modeling tradeoffs, surfacing hidden considerations, and showing likely next steps before they make major commitments.
+
 ## Problem
 
 Many people experience decision paralysis when choosing a career direction. They may be stuck between multiple options, worried about money, unsure whether to pursue school or work, or afraid of choosing the wrong path.
@@ -44,6 +52,13 @@ The current prototype compares:
 These paths are stored in:
 
 `data/career_paths.csv`
+
+## Data Sources
+
+ClarityFlow AI currently uses a small CSV-based prototype dataset stored in `data/career_paths.csv`. The dataset contains structured career-path options and comparison factors such as cost level, time to result, flexibility, credential strength, risk level, and income speed.
+
+The data is prototype/simulated career-path data created for the hackathon demo, not a live labor-market dataset. The app does not currently use PostgreSQL, Supabase, Firebase, external job APIs, or saved user data.
+
 
 ## Key Features
 
@@ -221,11 +236,18 @@ The app includes:
 * Optional decision map for transparency
 * Report wrong or harmful output option
 
-### High-Pressure Safety Behavior
+## Verification Notice
 
-If a user describes a high-pressure situation such as homelessness, pregnancy, abuse, unsafe housing, medical risk, lack of food, lack of transportation, domestic violence, trafficking risk, or immediate safety concerns, ClarityFlow is instructed to prioritize safety and human support before career planning.
+ClarityFlow AI is a decision-support prototype. It does not verify live salary, school, hiring, financial-aid, or labor-market data. Users are reminded to check trusted sources such as schools, employers, workforce offices, official program pages, advisors, mentors, counselors, or other trusted humans before acting.
 
-The app should avoid recommending physically risky work, major debt, relocation, quitting a job, or irreversible decisions for users in crisis.
+### Stability-First Guardrail
+
+If a user describes a high-pressure situation such as homelessness, unsafe housing, medical risk, lack of food, lack of transportation, domestic violence, trafficking risk, no income, or immediate safety concerns, ClarityFlow surfaces a stability-first warning.
+
+The app should avoid pushing users toward risky major commitments such as quitting a job, moving, taking on debt, enrolling in a paid program, or accepting unsafe work without human review.
+
+The goal is not to abandon the user’s career goal. The goal is to keep the next step smaller, safer, and more realistic while encouraging human support from a mentor, advisor, counselor, workforce worker, shelter or housing support, clinic, or trusted human.
+
 
 ### Report Wrong or Harmful Output
 
@@ -247,11 +269,16 @@ In a full version, these reports would go to a human review queue.
 
 * Python
 * Streamlit
+* Streamlit Cloud
 * Pandas
 * NumPy
-* OpenAI API
+* OpenAI LLM API
+* GPT-5 mini
 * CSV data layer
 * GitHub
+* HTML/CSS styling inside Streamlit
+* ChatGPT coding assistance for debugging, UX wording, Responsible AI planning, prompt design, GitHub/Streamlit troubleshooting, and app polish
+
 
 ## Main Files
 
