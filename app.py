@@ -302,9 +302,11 @@ st.write(
 )
 
 st.info(
-    "Responsible AI note: ClarityFlow supports decision-making, but it does not make "
-    "final life or career commitments for the user. Review major choices with a mentor, "
-    "advisor, counselor, workforce worker, or trusted human."
+    "Responsible AI note: ClarityFlow is a decision-support prototype. "
+    "It does not make final life or career commitments for the user, and it does not "
+    "verify live salary, school, job-market, financial aid, or hiring data. "
+    "Before acting, check trusted sources such as schools, employers, workforce offices, "
+    "official program pages, advisors, mentors, counselors, or other trusted humans."
 )
 
 st.divider()
