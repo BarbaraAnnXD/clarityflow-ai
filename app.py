@@ -133,7 +133,7 @@ st.markdown(
     /* Info / warning boxes */
     [data-testid="stAlert"] {
         border-radius: 16px;
-        border: 1px solid rgba(125, 249, 255, 0.35);
+        border: none;
         box-shadow: 0 0 18px rgba(0, 255, 255, 0.10);
         padding: 1rem 1.1rem;
     }
