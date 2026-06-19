@@ -40,32 +40,110 @@ st.markdown(
         color: #f5f7ff;
     }
 
-    /* Headings */
-    h1, h2, h3 {
+    /* Custom app title */
+    .app-title {
+        font-size: 3.2rem;
+        font-weight: 900;
         color: #ffffff;
-        letter-spacing: 0.02em;
+        margin-top: 0.5rem;
+        margin-bottom: 1.6rem;
+        letter-spacing: 0.03em;
+        text-shadow:
+            0 0 14px rgba(0, 255, 255, 0.65),
+            0 0 24px rgba(255, 0, 212, 0.25);
     }
 
+    .app-subtitle {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 1.4rem;
+        text-shadow: 0 0 10px rgba(0, 245, 255, 0.35);
+    }
+
+    /* Main page titles and section labels */
     h1 {
+        color: #ffffff;
+        font-size: 2.7rem;
+        line-height: 1.15;
+        letter-spacing: 0.02em;
         text-shadow: 0 0 14px rgba(0, 255, 255, 0.55);
     }
 
+    h2 {
+        color: #ffffff;
+        font-size: 2rem;
+        line-height: 1.25;
+        letter-spacing: 0.02em;
+    }
+
     h3 {
-        margin-top: 1.4rem;
-        margin-bottom: 0.5rem;
         color: #7df9ff;
+        font-size: 1.45rem;
+        line-height: 1.3;
+        margin-top: 1.4rem;
+        margin-bottom: 0.6rem;
+        letter-spacing: 0.02em;
+    }
+
+    /* Strong intro text */
+    strong {
+        font-size: 1.18rem;
+        line-height: 1.6;
     }
 
     /* Regular text */
     p, li, label, span {
         color: #f5f7ff;
+        font-size: 1.08rem;
+        line-height: 1.65;
+    }
+
+    /* Captions and helper text */
+    [data-testid="stCaptionContainer"],
+    [data-testid="stCaptionContainer"] p {
+        font-size: 1.12rem;
+        line-height: 1.65;
+        color: #d7e8ff;
+    }
+
+    /* Form labels */
+    [data-testid="stWidgetLabel"] label,
+    [data-testid="stWidgetLabel"] p {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #ffffff;
+    }
+
+    /* Slider text */
+    [data-testid="stSlider"] label,
+    [data-testid="stSlider"] p,
+    [data-testid="stSlider"] span {
+        font-size: 1.08rem;
+    }
+
+    /* Expander text */
+    [data-testid="stExpander"] p,
+    [data-testid="stExpander"] li,
+    [data-testid="stExpander"] span {
+        font-size: 1.06rem;
+        line-height: 1.6;
     }
 
     /* Info / warning boxes */
     [data-testid="stAlert"] {
-        border-radius: 14px;
+        border-radius: 16px;
         border: 1px solid rgba(125, 249, 255, 0.35);
-        box-shadow: 0 0 18px rgba(0, 255, 255, 0.08);
+        box-shadow: 0 0 18px rgba(0, 255, 255, 0.10);
+        padding: 1rem 1.1rem;
+    }
+
+    /* Alert text size */
+    [data-testid="stAlert"] p,
+    [data-testid="stAlert"] div,
+    [data-testid="stAlert"] span {
+        font-size: 1.08rem;
+        line-height: 1.6;
     }
 
     /* Buttons */
@@ -73,11 +151,35 @@ st.markdown(
         background: linear-gradient(90deg, #00f5ff, #ff00d4);
         color: #050510;
         border: none;
-        border-radius: 14px;
-        font-weight: 800;
-        letter-spacing: 0.03em;
-        box-shadow: 0 0 18px rgba(255, 0, 212, 0.35);
+        border-radius: 18px;
+        font-size: 1.35rem;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        padding: 1rem 2rem;
+        min-height: 64px;
+        box-shadow: 0 0 22px rgba(255, 0, 212, 0.45);
         transition: 0.2s ease-in-out;
+    }
+
+    /* Button text */
+    .stButton > button p,
+    .stButton > button span,
+    .stButton > button div {
+        font-size: 1.35rem !important;
+        font-weight: 900 !important;
+        color: #050510 !important;
+        line-height: 1.2 !important;
+    }
+
+    /* Section title labels */
+    .section-title {
+        font-size: 1.75rem;
+        font-weight: 900;
+        color: #7df9ff;
+        margin-top: 2rem;
+        margin-bottom: 0.85rem;
+        letter-spacing: 0.02em;
+        text-shadow: 0 0 12px rgba(0, 245, 255, 0.45);
     }
 
     .stButton > button:hover {
@@ -151,14 +253,14 @@ st.markdown(
 
     /* AI Strategy Plan text size */
     .ai-strategy-text {
-        font-size: 1.08rem;
-        line-height: 1.65;
+        font-size: 1.15rem;
+        line-height: 1.7;
     }
 
     .ai-strategy-text p,
     .ai-strategy-text li {
-        font-size: 1.08rem;
-        line-height: 1.65;
+        font-size: 1.15rem;
+        line-height: 1.7;
     }
 
     .ai-strategy-text h3 {
@@ -190,8 +292,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.title("ClarityFlow AI")
-st.subheader("Turn career noise into a clear next step.")
+st.markdown('<div class="app-title">ClarityFlow AI</div>', unsafe_allow_html=True)
+st.markdown('<div class="app-subtitle">Turn career noise into a clear next step.</div>', unsafe_allow_html=True)
 
 st.write(
     "You do not need to know the perfect career answer before using this. "
@@ -277,7 +379,7 @@ with col2:
         help="1 = skills/projects matter more, 10 = formal proof matters a lot"
     )
 
-st.subheader("Clarity Mode")
+st.markdown('<div class="section-title">Clarity Mode</div>', unsafe_allow_html=True)
 
 response_mode = st.selectbox(
     "How do you want ClarityFlow to guide you?",
